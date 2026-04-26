@@ -151,21 +151,28 @@ with st.sidebar:
 def speak_animal(animal_name, description):
     if voice_enabled:
         text = f"Animal detected! This is a {animal_name}. {description}"
-        st.markdown(f"""
+        # Use st.components to properly inject and run JavaScript
+        import streamlit.components.v1 as components
+        components.html(f"""
         <script>
-        var msg = new SpeechSynthesisUtterance("{text}");
-        msg.rate = 0.9;
-        msg.pitch = 1;
-        msg.volume = 1;
-        window.speechSynthesis.speak(msg);
+        function speak() {{
+            window.speechSynthesis.cancel();
+            var msg = new SpeechSynthesisUtterance("{text}");
+            msg.rate = 0.85;
+            msg.pitch = 1.0;
+            msg.volume = 1.0;
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }}
+        speak();
         </script>
-        """, unsafe_allow_html=True)
+        """, height=0)
 
 # ─── Detection Function ──────────────────────────────────────────────────────
 def detect_animal(image, api_key):
     buf = io.BytesIO()
     fmt = image.format if image.format else "JPEG"
-    if fmt not in ["JPEG", "PNG", "WEBP", "JFIF"]:
+    if fmt not in ["JPEG", "PNG", "WEBP"]:
         fmt = "JPEG"
     image.save(buf, format=fmt)
     img_bytes = buf.getvalue()
@@ -248,7 +255,7 @@ tab1, tab2 = st.tabs(["📁 Upload Image", "📷 Live Camera"])
 with tab1:
     uploaded_file = st.file_uploader(
         "Upload an animal image",
-        type=["jpg", "jpeg", "png", "webp", "jfif"],
+        type=["jpg", "jpeg", "png", "webp"],
     )
 
     if uploaded_file:
