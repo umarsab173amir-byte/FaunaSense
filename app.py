@@ -151,22 +151,33 @@ with st.sidebar:
 def speak_animal(animal_name, description):
     if voice_enabled:
         text = f"Animal detected! This is a {animal_name}. {description}"
-        # Use st.components to properly inject and run JavaScript
         import streamlit.components.v1 as components
         components.html(f"""
+        <div style="margin-top:10px;">
+            <button onclick="speakNow()" style="
+                background: linear-gradient(90deg, #f5c842, #f58c42);
+                color: #0d1b2a;
+                border: none;
+                padding: 10px 28px;
+                border-radius: 50px;
+                font-size: 15px;
+                font-weight: bold;
+                cursor: pointer;
+                width: 100%;
+            ">🔊 Speak Result</button>
+        </div>
         <script>
-        function speak() {{
+        function speakNow() {{
             window.speechSynthesis.cancel();
             var msg = new SpeechSynthesisUtterance("{text}");
             msg.rate = 0.85;
             msg.pitch = 1.0;
             msg.volume = 1.0;
-            msg.lang = 'en-US';
+            msg.lang = "en-US";
             window.speechSynthesis.speak(msg);
         }}
-        speak();
         </script>
-        """, height=0)
+        """, height=60)
 
 # ─── Detection Function ──────────────────────────────────────────────────────
 def detect_animal(image, api_key):
